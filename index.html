@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Confirmation Generator</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#152A4E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#152A4E;
+    --navy-deep:#0D1B33;
+    --amber:#F0A93A;
+    --amber-deep:#D98F1E;
+    --slate:#5B6478;
+    --line:#E3E6EE;
+    --bg:#F4F5F9;
+    --card:#FFFFFF;
+    --ok:#2E9E5B;
+    --danger:#D64545;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Inter',sans-serif;
+    margin:0;
+    background:var(--bg);
+    color:var(--navy-deep);
+    padding:28px 20px 60px;
+  }
+  .page-head{
+    max-width:1280px;
+    margin:0 auto 24px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .page-head .brand{
+    font-family:'Sora',sans-serif;
+    font-weight:800;
+    font-size:26px;
+    letter-spacing:-0.02em;
+    color:var(--navy);
+  }
+  .page-head .brand span{color:var(--amber-deep);}
+  .page-head .tag{
+    font-size:13px;
+    color:var(--slate);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .container{
+    max-width:1280px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:22px;
+    align-items:start;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    border:1px solid var(--line);
+    box-shadow:0 1px 2px rgba(21,42,78,0.04), 0 10px 30px -18px rgba(21,42,78,0.18);
+  }
+  .form-card{padding:26px 26px 30px;}
+  .section-title{
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--navy);
+    margin:26px 0 12px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title:first-of-type{margin-top:0;}
+  .section-title .num{
+    background:var(--navy);
+    color:#fff;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    width:20px;height:20px;
+    border-radius:5px;
+    display:flex;align-items:center;justify-content:center;
+    letter-spacing:0;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+  .field{margin-bottom:0;}
+  .field.full{grid-column:1 / -1;}
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--slate);
+    margin-bottom:5px;
+  }
+  label .req{color:var(--danger);}
+  input, select, textarea{
+    width:100%;
+    padding:10px 12px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    color:var(--navy-deep);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  textarea{resize:vertical;min-height:44px;}
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color:var(--amber-deep);
+    box-shadow:0 0 0 3px rgba(240,169,58,0.18);
+  }
+  .conditional{
+    display:none;
+    background:#FFF8EC;
+    border:1.5px dashed var(--amber-deep);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-top:10px;
+  }
+  .conditional.show{display:block;}
+  .checkbox-row{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    padding:6px 2px;
+  }
+  .checkbox-row label{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--navy-deep);
+    margin:0;
+    cursor:pointer;
+  }
+  .checkbox-row input[type="checkbox"]{width:16px;height:16px;margin:0;accent-color:var(--amber-deep);}
+  .btn-row{display:flex;gap:10px;margin-top:26px;}
+  button{
+    flex:1;
+    padding:13px 16px;
+    font-size:14.5px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
+    border-radius:9px;
+    border:none;
+    cursor:pointer;
+    transition:transform .1s ease, background .15s ease;
+  }
+  button:active{transform:scale(0.98);}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-deep);}
+  .btn-secondary{background:#fff;color:var(--slate);border:1.5px solid var(--line);flex:0 0 110px;}
+  .btn-secondary:hover{border-color:var(--slate);}
+
+  .output-card{
+    padding:22px 22px 26px;
+    position:sticky;
+    top:20px;
+    display:flex;
+    flex-direction:column;
+    max-height:calc(100vh - 40px);
+  }
+  .output-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .output-head h3{
+    font-family:'Sora',sans-serif;
+    font-size:15px;
+    margin:0;
+    color:var(--navy);
+  }
+  #output{
+    flex:1;
+    min-height:420px;
+    overflow-y:auto;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    font-family:Verdana, sans-serif;
+    font-size:10pt;
+    line-height:1.6;
+    white-space:pre-wrap;
+    background:#FCFCFD;
+    color:var(--navy-deep);
+  }
+  #output:empty::before{
+    content:"Fill in the form and hit Generate — your confirmation email will appear here.";
+    color:var(--slate);
+    font-family:'Inter',sans-serif;
+    font-style:italic;
+  }
+  .copy-confirm{
+    color:var(--ok);
+    font-size:13px;
+    font-weight:600;
+    margin-top:10px;
+    display:none;
+  }
+  .hidden-textarea{position:absolute;left:-9999px;}
+
+  @media (max-width: 980px){
+    .container{grid-template-columns:1fr;}
+    .grid2{grid-template-columns:1fr;}
+    .output-card{position:static;max-height:none;}
+    input, select, textarea, button{font-size:16px;padding:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="brand">Training <span>Confirmation</span> Generator</div>
+  <div class="tag">Created by Tapendu @2026, July</div>
+</div>
+
+<div class="container">
+
+  <div class="card form-card">
+
+    <div class="section-title"><span class="num">1</span>Session & Customer Details</div>
+    <div class="grid2">
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date">
+      </div>
+      <div class="field">
+        <label for="restId">Restaurant ID / ORG ID</label>
+        <input type="number" id="restId" placeholder="e.g. 123456">
+      </div>
+      <div class="field full">
+        <label for="restName">Restaurant Name / Business Name</label>
+        <input type="text" id="restName" placeholder="e.g. Spice Route Kitchen">
+      </div>
+      <div class="field">
+        <label for="userType">User Type</label>
+        <select id="userType">
+          <option value="NPU (Non-Petpooja User)">NPU (Non-Petpooja User)</option>
+          <option value="PPU (Petpooja User)">PPU (Petpooja User)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="person">Name of Person</label>
+        <input type="text" id="person" placeholder="Trainee name">
+      </div>
+      <div class="field full">
+        <label for="contact">Contact of Trainee</label>
+        <input type="tel" id="contact" placeholder="10-digit mobile number" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="section-title"><span class="num">2</span>Training Specifics</div>
+    <div class="grid2">
+      <div class="field">
+        <label for="trainingType">Training Type</label>
+        <select id="trainingType">
+          <option value="New">New</option>
+          <option value="Retraining">Retraining</option>
+          <option value="Support Issue">Support Issue</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="trainingMode">Training Mode</label>
+        <select id="trainingMode">
+          <option value="Physical">Physical</option>
+          <option value="Virtual">Virtual</option>
+          <option value="Out of station">Out of station</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <div id="retrainWrap" class="conditional">
+          <label for="retrainReason">Retraining / Support Issue Reason <span class="req">*</span></label>
+          <input type="text" id="retrainReason" placeholder="Reason for retraining or support ticket">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="product">Product</label>
+        <select id="product">
+          <option value="POS">POS</option>
+          <option value="Payroll">Payroll</option>
+          <option value="PP Invoice">PP Invoice</option>
+          <option value="Purchase">Purchase</option>
+          <option value="WCD">WCD (Waiter Calling Device)</option>
+          <option value="Task Management">Task Management</option>
+          <option value="Reservation">Reservation</option>
+          <option value="Mosambee EDC / Petpooja Pay">Mosambee EDC / Petpooja Pay</option>
+          <option value="Retail POS">Retail POS</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="subProduct">Sub-product</label>
+        <select id="subProduct">
+          <option value="POS Basic">POS Basic</option>
+          <option value="POS+Growth">POS+Growth</option>
+          <option value="POS+Scale">POS+Scale</option>
+          <option value="Local POS Basic">Local POS Basic</option>
+          <option value="NA">NA</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label for="features">Product Features Covered</label>
+        <textarea id="features" rows="2" placeholder="e.g. Billing, KOT, Menu management, Reports"></textarea>
+      </div>
+      <div class="field full">
+        <label for="marketplace">Marketplace Services Covered</label>
+        <textarea id="marketplace" rows="2" placeholder="As per client plan or individual services bought"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="start">Training Start Time</label>
+        <input type="time" id="start">
+      </div>
+      <div class="field">
+        <label for="end">Training End Time</label>
+        <input type="time" id="end">
+      </div>
+
+      <div class="field">
+        <label for="trainingStatus">Training Status</label>
+        <select id="trainingStatus">
+          <option value="Completed">Completed</option>
+          <option value="Incomplete">Incomplete</option>
+        </select>
+      </div>
+      <div class="field"></div>
+
+      <div class="field full">
+        <div id="incompleteWrap" class="conditional">
+          <label for="incompleteReason">Incomplete Reason <span class="req">*</span></label>
+          <textarea id="incompleteReason" rows="2" placeholder="Reason training is incomplete — mention supportive attachment (outlet photo) separately"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="num">3</span>Setup & Attendance</div>
+    <div class="grid2">
+      <div class="field">
+        <label for="ownerDashboard">Owner Dashboard</label>
+        <select id="ownerDashboard">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
+      </div>
+      <div class="field">
+        <div id="aiAgentWrap" class="conditional">
+          <label for="aiAgent">AI Agent (Petpooja) <span class="req">*</span></label>
+          <select id="aiAgent">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Training Attended By</label>
+        <div class="checkbox-row">
+          <label><input type="checkbox" class="attendee" value="Owner"> Owner</label>
+          <label><input type="checkbox" class="attendee" value="Manager"> Manager</label>
+          <label><input type="checkbox" class="attendee" value="Staff" id="staffCheck"> Staff</label>
+        </div>
+        <div id="staffNameWrap" class="conditional">
+          <label for="staffName">Staff Name</label>
+          <input type="text" id="staffName" placeholder="Enter staff name">
+        </div>
+      </div>
+
+      <div class="field full">
+        <label for="parallelSetup">Parallel Setup Done</label>
+        <select id="parallelSetup">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Already Done Remotely">Already Done Remotely</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="num">4</span>Checklist Template</div>
+    <div class="grid2">
+      <div class="field full">
+        <label for="template">Select Template</label>
+        <select id="template">
+          <option value="payroll">Payroll Template</option>
+          <option value="pos">POS Template</option>
+          <option value="pospayroll">POS with Payroll Template</option>
+          <option value="purchase">Petpooja Purchase Template</option>
+          <option value="wcd">WCD Template</option>
+          <option value="task">Task Template</option>
+          <option value="reservation">Reservation Template</option>
+          <option value="edc">Mosambee EDC & Petpooja Pay/EDC Template</option>
+          <option value="retail">Retail POS Template</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="num">5</span>Additional Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--slate);font-size:12px;">(optional)</span></div>
+    <div class="grid2">
+      <div class="field full">
+        <label for="pendingServices">Pending Services / Product (I&T)</label>
+        <textarea id="pendingServices" rows="2" placeholder="Mention any pending item with the reason"></textarea>
+      </div>
+      <div class="field full">
+        <label for="specialNote">Special Note / Instructions</label>
+        <textarea id="specialNote" rows="2" placeholder="Location exceptions, remote setup, dev requirement requested, unresolved issue, replacement, etc."></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="generateTemplate()">Generate Email</button>
+      <button class="btn-secondary" onclick="resetForm()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card output-card">
+    <div class="output-head">
+      <h3>Email Output</h3>
+    </div>
+    <div id="output" contenteditable="true"></div>
+    <button class="btn-primary" style="margin-top:14px;" onclick="copyOutput()">Copy to Clipboard</button>
+    <div class="copy-confirm" id="copyConfirm">✓ Copied to clipboard!</div>
+    <textarea id="hiddenTextarea" class="hidden-textarea"></textarea>
+  </div>
+
+</div>
+
+<script>
+  // ---- Conditional field logic ----
+  function refreshConditionals(){
+    const trainingType = document.getElementById('trainingType').value;
+    document.getElementById('retrainWrap').classList.toggle('show', trainingType === 'Retraining' || trainingType === 'Support Issue');
+
+    const trainingStatus = document.getElementById('trainingStatus').value;
+    document.getElementById('incompleteWrap').classList.toggle('show', trainingStatus === 'Incomplete');
+
+    const ownerDashboard = document.getElementById('ownerDashboard').value;
+    document.getElementById('aiAgentWrap').classList.toggle('show', ownerDashboard === 'Yes');
+
+    const staffChecked = document.getElementById('staffCheck').checked;
+    document.getElementById('staffNameWrap').classList.toggle('show', staffChecked);
+  }
+
+  ['trainingType','trainingStatus','ownerDashboard'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', refreshConditionals);
+  });
+  document.getElementById('staffCheck').addEventListener('change', refreshConditionals);
+
+  // ---- Auto-save ----
+  function autoSave() {
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.type === "checkbox") {
+        localStorage.setItem(el.id || el.value, el.checked ? "1" : "0");
+      } else {
+        localStorage.setItem(el.id, el.value);
+      }
+    });
+    localStorage.setItem("outputContent", document.getElementById("output").innerText);
+  }
+  function restoreData() {
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.type === "checkbox") {
+        const key = el.id || el.value;
+        const saved = localStorage.getItem(key);
+        if (saved !== null) el.checked = saved === "1";
+      } else {
+        const saved = localStorage.getItem(el.id);
+        if (saved !== null && el.id) el.value = saved;
+      }
+    });
+    const savedOutput = localStorage.getItem("outputContent");
+    if (savedOutput) document.getElementById("output").innerText = savedOutput;
+    if (!document.getElementById('date').value) {
+      document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    }
+    refreshConditionals();
+  }
+  window.addEventListener("input", autoSave);
+  window.addEventListener("change", autoSave);
+  window.addEventListener("keyup", autoSave);
+  window.addEventListener("load", restoreData);
+
+  // ---- Service Worker ----
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(() => console.log("Service Worker Registered"));
+  }
+
+  // ---- Helpers ----
+  function formatTime(time) {
+    if (!time) return "";
+    let [hour, minute] = time.split(":");
+    hour = parseInt(hour);
+    const ampm = hour >= 12 ? "P.M" : "A.M";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  }
+  function formatDate(d) {
+    if (!d) return "";
+    const [y, m, day] = d.split("-");
+    return `${day}/${m}/${y}`;
+  }
+  function val(id){ return document.getElementById(id).value; }
+
+  function buildHeader() {
+    const date = formatDate(val('date'));
+    const restId = val('restId');
+    const restName = val('restName');
+    const userType = val('userType');
+    const person = val('person');
+    const contact = val('contact');
+    const trainingType = val('trainingType');
+    const retrainReason = val('retrainReason');
+    const trainingMode = val('trainingMode');
+    const product = val('product');
+    const subProduct = val('subProduct');
+    const features = val('features');
+    const marketplace = val('marketplace');
+    const start = formatTime(val('start'));
+    const end = formatTime(val('end'));
+    const trainingStatus = val('trainingStatus');
+    const ownerDashboard = val('ownerDashboard');
+    const aiAgent = val('aiAgent');
+
+    const attendees = Array.from(document.querySelectorAll('.attendee:checked')).map(cb => {
+      if (cb.value === 'Staff') {
+        const name = val('staffName');
+        return name ? `Staff (${name})` : 'Staff';
+      }
+      return cb.value;
+    });
+    const attendedBy = attendees.length ? attendees.join(', ') : '—';
+    const parallelSetup = val('parallelSetup');
+
+    let retrainLine = '';
+    if (trainingType === 'Retraining' || trainingType === 'Support Issue') {
+      retrainLine = `\nRetraining Reason: ${retrainReason}`;
+    }
+    let aiLine = '';
+    if (ownerDashboard === 'Yes') {
+      aiLine = `\nAI Agent (Petpooja): ${aiAgent}`;
+    }
+
+    return `Dear Customer,
+
+Greetings from Petpooja!
+Thank you for your time. This email confirms that the ${trainingMode} training session has been successfully conducted and the ticket is now closed.
+
+Date: ${date}
+Restaurant ID / ORG ID: ${restId}
+Restaurant Name/Business Name: ${restName}
+User Type: ${userType}
+Name of Person: ${person}
+Contact of Trainee: ${contact}
+Training Type: ${trainingType}${retrainLine}
+Training Mode: ${trainingMode}
+Product: ${product}
+Sub-product: ${subProduct}
+Product Features Covered: ${features}
+Marketplace Services Covered: ${marketplace}
+Training Start Time: ${start}
+Training End Time: ${end}
+Training Status: ${trainingStatus}
+Owner Dashboard: ${ownerDashboard}${aiLine}
+Training Attended By: ${attendedBy}
+Parallel Setup Done: ${parallelSetup}
+
+In this training, I have covered:
+`;
+  }
+
+  function buildFooter() {
+    let out = '';
+    const trainingStatus = val('trainingStatus');
+    const incompleteReason = val('incompleteReason');
+    const pendingServices = val('pendingServices');
+    const specialNote = val('specialNote');
+
+    if (trainingStatus === 'Incomplete' && incompleteReason) {
+      out += `\nIncomplete Reason: ${incompleteReason} (Supportive attachment — outlet photo — to be shared separately)\n`;
+    }
+    if (pendingServices) {
+      out += `\nPending Services / Product (I&T): ${pendingServices}\n`;
+    }
+    if (specialNote) {
+      out += `\nSpecial Note / Instructions: ${specialNote}\n`;
+    }
+
+    out += `
+We hope the session was informative. For any questions or further assistance, reach us any time on +91 79 6922 3344 (available 24×7) or support@petpooja.com. Kindly acknowledge receipt of this email.
+
+We also welcome your feedback — it helps us keep improving our service.
+Feedback link: https://forms.gle/XXHMVTV8xxZH3AXg6`;
+    return out;
+  }
+
+  const checklists = {
+    retail: `Basic Setup:
+Login Process : Yes / No
+Item Addition : Yes / No
+Inventory Preferences : Yes / No
+Sales Preferences : Yes / No
+POS Preferences : Yes / No
+GST and Tax Preferences : Yes / No
+
+POS & Hardware Setup:
+POS Installations and Counter Set-up : Yes / No
+Printers and Template Set-up : Yes / No
+Barcode Set-up and Printing Guide : Yes / No
+
+Operations & Transactions:
+Stock Management : Yes / No
+Purchase Bill and Purchase Training (Advance Plan) : Yes / No / NA
+Auto-sync and Retail Invoices on the Dashboard : Yes / No
+Dashboard Overview : Yes / No
+Invoice Creation and Preferences : Yes / No
+Process of Adding Receipts and Payments : Yes / No
+POS Overview and Understanding : Yes / No
+Step-by-step POS Usage Guide : Yes / No
+
+Reports & Monitoring:
+Reports and Dashboard : Yes / No`,
+
+    payroll: `Petpooja Payroll:
+
+Phase 1
+Owner Dashboard & Mobile App : Yes
+Biometric Device Intro & Setup : No
+Device Light Indication : No
+Wi-Fi Connectivity : No
+
+Phase 2
+Add Employee (Web & App) : Yes (Web)
+Biometric Registration : No
+Shift & Roster Management : Yes
+Week Off & Leave Setup : Yes
+User Management & Reports : Yes
+Payroll Module & Salary Slip : Yes
+Owner App Quick Actions : No
+
+Phase 3
+Employee App Training : No
+Language Setup : No
+Leave Apply & Regularisation : Yes
+Attendance & Salary Slip Check : Yes
+Re login after Device Change : Yes`,
+
+    pos: `POS Check List:
+POS Installation & Setup : Yes / No
+Printer Configuration & Cash Drawer : Yes / No
+Billing & Order Flow : Yes / No
+Operations : Yes / No
+Item Management (POS Menu) : Yes / No
+Inventory & Stock Management : Yes / No
+Reports : Yes / No
+Restaurant Configuration & Logs : Yes / No
+
+Dashboard Check List:
+Main Dashboard View : Yes / No
+Daily Operations : Yes / No
+Menu Management : Yes / No
+Reports : Yes / No
+CRM : Yes / No
+User Management : Yes / No
+Petpooja Agent AI : Yes / No
+Petpooja App & Quick Links Configurations : Yes / No`,
+
+    pospayroll: `Petpooja POSS :
+1) Billing & KOT management.
+2) Printer Setup.(Kitchen LAN printer)
+3) Reports.
+4) Menu management.
+5) Owner Dashboard.
+6) Captain app ordering.
+
+Petpooja Payroll:
+Phase 1
+Owner Dashboard & Mobile App : Yes
+Biometric Device Intro & Setup : No
+Device Light Indication : No
+Wi-Fi Connectivity : No
+
+Phase 2
+Add Employee (Web & App) : Yes (Web)
+Biometric Registration : No
+Shift & Roster Management : Yes
+Week Off & Leave Setup : Yes
+User Management & Reports : Yes
+Payroll Module & Salary Slip : Yes
+Owner App Quick Actions : No
+
+Phase 3
+Employee App Training : No
+Language Setup : No
+Leave Apply & Regularisation : Yes
+Attendance & Salary Slip Check : Yes
+Re login after Device Change : Yes`,
+
+    purchase: `Standard Raw Material / AI Recipe - activated: Yes/No
+Dashboard: Yes/No
+Upload Invoice: Yes/No (mention count)
+Review Invoice: Yes/No
+Tag Management: Yes/No
+Push to Petpooja: Yes/No
+Reports: Yes/No
+Petty Cash Management: Yes/No
+Purchase App: Yes/No
+Banking & KYC: Yes/No`,
+
+    task: `Task Assignment Process Understanding Taken : Yes / No
+Sub Task / Group Task – Applicable or Not : Yes / No / NA
+Project Management – Applicable or Not : Yes / No / NA
+Forms – Applicable or Not : Yes / No / NA
+Application Downloaded & Login URL Bookmarked : Yes / No
+Department Created & User Assigned : Yes / No
+Task Assignment and Browse Templates : Yes / No
+Task Completion Process Explained : Yes / No
+Reports : Yes / No`,
+
+    reservation: `Employee Management : Yes / No / NA
+Form & QR Creation : Yes / No
+Reservation and Queue Management Feature : Yes / No
+Inquiries : Yes / No
+Order While In Queue : Yes / No / NA
+Customer Profile : Yes / No
+RSVP Feature Explained : Yes / No
+Cover Charge & Transaction : Yes / No / NA
+Live Table Flow : Yes / No
+Calendar View : Yes / No
+Feedback Flow : Yes / No
+Reservations Management and Aggregator Integrations : Yes / No
+Report : Yes / No`,
+
+    edc: `Mosambee EDC
+
+Static IP Fix : Yes / No
+Explain POS Billing & Order Landing Process (Dine In Order) : Yes / No / NA
+MQTT Cover (Pick Up & Delivery Order) : Yes / No / NA
+Add Money Feature Guided : Yes / No / NA
+Finance Dashboard Training : Yes / No / NA
+Payment Reconciliation : Yes / No / NA
+
+Petpooja Pay/EDC
+
+Explain POS Billing Process : Yes / No
+Demonstrate Payment Collection Process : Yes / No
+Share Transaction Proof : Yes / No
+Explain POS–EDC Device Connectivity & Static IP Fix : Yes / No`,
+
+    wcd: `1) Waiter Calling Devices (08) Installation (Setup type - wifi) & Training
+
+Here I attached the screenshot of the working WCD
+
+Note: You have to charge all the devices for a full night with a dedicated charger only, and make sure every 4-5 days we charge the devices subsequently. If a device is fully discharged, the device lights will turn on only after half an hour of continuous charging.`
+  };
+
+  function generateTemplate() {
+    const template = val('template');
+    const header = buildHeader();
+    const checklist = checklists[template] || '';
+    const footer = buildFooter();
+
+    const content = header + checklist + '\n' + footer;
+    document.getElementById('output').innerText = content;
+    autoSave();
+  }
+
+  function resetForm() {
+    localStorage.clear();
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.type === "checkbox") el.checked = false;
+      else el.value = "";
+    });
+    document.getElementById("output").innerText = "";
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    refreshConditionals();
+  }
+
+  function copyOutput() {
+    const output = document.getElementById("output").innerText;
+    const hiddenTextarea = document.getElementById("hiddenTextarea");
+    hiddenTextarea.value = output;
+    hiddenTextarea.select();
+    hiddenTextarea.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    const confirmMsg = document.getElementById("copyConfirm");
+    confirmMsg.style.display = "block";
+    setTimeout(() => confirmMsg.style.display = "none", 2000);
+  }
+</script>
+</body>
+</html>
