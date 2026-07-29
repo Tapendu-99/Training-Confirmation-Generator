@@ -282,6 +282,16 @@
         </select>
       </div>
 
+      <div class="field">
+        <label for="ticketSource">Ticket Received From</label>
+        <select id="ticketSource">
+          <option value="New Support Ticket">New Support Ticket</option>
+          <option value="Centralized Query Ticket">Centralized Query Ticket</option>
+          <option value="New Zoho Ticket">New Zoho Ticket</option>
+        </select>
+      </div>
+      <div class="field"></div>
+
       <div class="field full">
         <div id="retrainWrap" class="conditional">
           <label for="retrainReason">Retraining / Support Issue Reason <span class="req">*</span></label>
@@ -311,10 +321,10 @@
           <option value="POS+Growth">POS+Growth</option>
           <option value="POS+Scale">POS+Scale</option>
           <option value="Local POS Basic">Local POS Basic</option>
-          <option value="Petpooja Invoice Android (Basic)">Petpooja Invoice Android (Basic)</option>
-	        <option value="Petpooja Invoice Android (Advance)">Petpooja Invoice Android (Advance)</option>
-	        <option value="Petpooja Invoice Desktop (Basic)">Petpooja Invoice Desktop (Basic)</option>
-	        <option value="Petpooja Invoice Desktop (Advance)">Petpooja Invoice Desktop (Advance)</option>
+	 <option value="Petpooja Invoice Android (Basic)">Petpooja Invoice Android (Basic)</option>
+	 <option value="Petpooja Invoice Android (Advance)">Petpooja Invoice Android (Advance)</option>
+	 <option value="Petpooja Invoice Desktop (Basic)">Petpooja Invoice Desktop (Basic)</option>
+	 <option value="Petpooja Invoice Desktop (Advance)">Petpooja Invoice Desktop (Advance)</option>
           <option value="NA">NA</option>
           <option value="Other">Other</option>
         </select>
@@ -531,6 +541,7 @@
     const trainingType = val('trainingType');
     const retrainReason = val('retrainReason');
     const trainingMode = val('trainingMode');
+    const ticketSource = val('ticketSource');
     const product = val('product');
     const subProduct = val('subProduct');
     const features = val('features');
@@ -573,6 +584,7 @@ Name of Person: ${person}
 Contact of Trainee: ${contact}
 Training Type: ${trainingType}${retrainLine}
 Training Mode: ${trainingMode}
+Ticket Received From: ${ticketSource}
 Product: ${product}
 Sub-product: ${subProduct}
 Product Features Covered: ${features}
