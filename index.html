@@ -164,6 +164,74 @@
   .btn-secondary{background:#fff;color:var(--slate);border:1.5px solid var(--line);flex:0 0 110px;}
   .btn-secondary:hover{border-color:var(--slate);}
 
+  /* ---- Interactive checklist ---- */
+  #checklistFields{
+    margin-top:14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:10px 14px 4px;
+    background:#FAFAFC;
+    max-height:360px;
+    overflow-y:auto;
+  }
+  .cl-heading{
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--navy);
+    margin:14px 0 6px;
+    padding-bottom:5px;
+    border-bottom:1px solid var(--line);
+  }
+  .cl-heading:first-child{margin-top:4px;}
+  .cl-item{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 14px;
+    padding:8px 2px;
+    border-bottom:1px dashed var(--line);
+  }
+  .cl-item:last-child{border-bottom:none;}
+  .cl-label{
+    flex:1 1 240px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--navy-deep);
+  }
+  .cl-options{display:flex;gap:10px;flex-wrap:wrap;}
+  .cl-opt{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--slate);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .cl-opt input{width:14px;height:14px;margin:0;accent-color:var(--amber-deep);}
+  .cl-opt:has(input:checked){color:var(--navy-deep);}
+  .cl-note{
+    flex:0 0 130px;
+    padding:6px 8px;
+    font-size:12px;
+    border-radius:6px;
+    border:1.5px solid var(--line);
+  }
+  .cl-fixed-note{
+    font-size:12px;
+    color:var(--slate);
+    background:#FFF8EC;
+    border:1px dashed var(--amber-deep);
+    border-radius:8px;
+    padding:8px 10px;
+    margin:10px 0;
+    white-space:pre-wrap;
+  }
+
   .output-card{
     padding:22px 22px 26px;
     position:sticky;
@@ -424,6 +492,7 @@
         </select>
       </div>
     </div>
+    <div id="checklistFields"></div>
 
     <div class="section-title"><span class="num">5</span>Additional Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--slate);font-size:12px;">(optional)</span></div>
     <div class="grid2">
@@ -456,6 +525,295 @@
 </div>
 
 <script>
+  // ==================================================================
+  // ---- Checklist data model ----
+  // Each template = { header: string|null, sections: [ {heading, items:[{label, options, default, note}]} ], fixedNote: string|null }
+  // ==================================================================
+  const templates = {
+    retail: {
+      header: null,
+      sections: [
+        { heading:"Basic Setup:", items:[
+          {label:"Login Process", options:["Yes","No"]},
+          {label:"Item Addition", options:["Yes","No"]},
+          {label:"Inventory Preferences", options:["Yes","No"]},
+          {label:"Sales Preferences", options:["Yes","No"]},
+          {label:"POS Preferences", options:["Yes","No"]},
+          {label:"GST and Tax Preferences", options:["Yes","No"]}
+        ]},
+        { heading:"POS & Hardware Setup:", items:[
+          {label:"POS Installations and Counter Set-up", options:["Yes","No"]},
+          {label:"Printers and Template Set-up", options:["Yes","No"]},
+          {label:"Barcode Set-up and Printing Guide", options:["Yes","No"]}
+        ]},
+        { heading:"Operations & Transactions:", items:[
+          {label:"Stock Management", options:["Yes","No"]},
+          {label:"Purchase Bill and Purchase Training (Advance Plan)", options:["Yes","No","NA"]},
+          {label:"Auto-sync and Retail Invoices on the Dashboard", options:["Yes","No"]},
+          {label:"Dashboard Overview", options:["Yes","No"]},
+          {label:"Invoice Creation and Preferences", options:["Yes","No"]},
+          {label:"Process of Adding Receipts and Payments", options:["Yes","No"]},
+          {label:"POS Overview and Understanding", options:["Yes","No"]},
+          {label:"Step-by-step POS Usage Guide", options:["Yes","No"]},
+          {label:"AI Garments Try on", options:["Yes","No"]}
+        ]},
+        { heading:"Reports & Monitoring:", items:[
+          {label:"Reports and Dashboard", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    payroll: {
+      header:"Petpooja Payroll:",
+      sections:[
+        { heading:"Phase 1", items:[
+          {label:"Owner Dashboard & Mobile App", options:["Yes","No"], default:"Yes"},
+          {label:"Biometric Device Intro & Setup", options:["Yes","No"], default:"No"},
+          {label:"Device Light Indication", options:["Yes","No"], default:"No"},
+          {label:"Wi-Fi Connectivity", options:["Yes","No"], default:"No"}
+        ]},
+        { heading:"Phase 2", items:[
+          {label:"Add Employee (Web & App)", options:["Yes (Web)","Yes (App)","Yes (Both)","No"], default:"Yes (Web)"},
+          {label:"Biometric Registration", options:["Yes","No"], default:"No"},
+          {label:"Shift & Roster Management", options:["Yes","No"], default:"Yes"},
+          {label:"Week Off & Leave Setup", options:["Yes","No"], default:"Yes"},
+          {label:"User Management & Reports", options:["Yes","No"], default:"Yes"},
+          {label:"Payroll Module & Salary Slip", options:["Yes","No"], default:"Yes"},
+          {label:"Owner App Quick Actions", options:["Yes","No"], default:"No"}
+        ]},
+        { heading:"Phase 3", items:[
+          {label:"Employee App Training", options:["Yes","No"], default:"No"},
+          {label:"Language Setup", options:["Yes","No"], default:"No"},
+          {label:"Leave Apply & Regularisation", options:["Yes","No"], default:"Yes"},
+          {label:"Attendance & Salary Slip Check", options:["Yes","No"], default:"Yes"},
+          {label:"Re login after Device Change", options:["Yes","No"], default:"Yes"}
+        ]}
+      ]
+    },
+
+    pos: {
+      header:null,
+      sections:[
+        { heading:"POS Check List:", items:[
+          {label:"POS Installation & Setup", options:["Yes","No"]},
+          {label:"Printer Configuration & Cash Drawer", options:["Yes","No"]},
+          {label:"Billing & Order Flow", options:["Yes","No"]},
+          {label:"Operations", options:["Yes","No"]},
+          {label:"Item Management (POS Menu)", options:["Yes","No"]},
+          {label:"Inventory & Stock Management", options:["Yes","No"]},
+          {label:"Reports", options:["Yes","No"]},
+          {label:"Restaurant Configuration & Logs", options:["Yes","No"]}
+        ]},
+        { heading:"Dashboard Check List:", items:[
+          {label:"Main Dashboard View", options:["Yes","No"]},
+          {label:"Daily Operations", options:["Yes","No"]},
+          {label:"Menu Management", options:["Yes","No"]},
+          {label:"Reports", options:["Yes","No"]},
+          {label:"CRM", options:["Yes","No"]},
+          {label:"User Management", options:["Yes","No"]},
+          {label:"Petpooja Agent AI", options:["Yes","No"]},
+          {label:"Petpooja App & Quick Links Configurations", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    pospayroll: {
+      header:null,
+      sections:[
+        { heading:"Petpooja POSS:", items:[
+          {label:"Billing & KOT management", options:["Yes","No"]},
+          {label:"Printer Setup (Kitchen LAN printer)", options:["Yes","No"]},
+          {label:"Reports", options:["Yes","No"]},
+          {label:"Menu management", options:["Yes","No"]},
+          {label:"Owner Dashboard", options:["Yes","No"]},
+          {label:"Captain app ordering", options:["Yes","No"]}
+        ]},
+        { heading:"Petpooja Payroll:", items:[] },
+        { heading:"Phase 1", items:[
+          {label:"Owner Dashboard & Mobile App", options:["Yes","No"], default:"Yes"},
+          {label:"Biometric Device Intro & Setup", options:["Yes","No"], default:"No"},
+          {label:"Device Light Indication", options:["Yes","No"], default:"No"},
+          {label:"Wi-Fi Connectivity", options:["Yes","No"], default:"No"}
+        ]},
+        { heading:"Phase 2", items:[
+          {label:"Add Employee (Web & App)", options:["Yes (Web)","Yes (App)","Yes (Both)","No"], default:"Yes (Web)"},
+          {label:"Biometric Registration", options:["Yes","No"], default:"No"},
+          {label:"Shift & Roster Management", options:["Yes","No"], default:"Yes"},
+          {label:"Week Off & Leave Setup", options:["Yes","No"], default:"Yes"},
+          {label:"User Management & Reports", options:["Yes","No"], default:"Yes"},
+          {label:"Payroll Module & Salary Slip", options:["Yes","No"], default:"Yes"},
+          {label:"Owner App Quick Actions", options:["Yes","No"], default:"No"}
+        ]},
+        { heading:"Phase 3", items:[
+          {label:"Employee App Training", options:["Yes","No"], default:"No"},
+          {label:"Language Setup", options:["Yes","No"], default:"No"},
+          {label:"Leave Apply & Regularisation", options:["Yes","No"], default:"Yes"},
+          {label:"Attendance & Salary Slip Check", options:["Yes","No"], default:"Yes"},
+          {label:"Re login after Device Change", options:["Yes","No"], default:"Yes"}
+        ]}
+      ]
+    },
+
+    purchase: {
+      header:null,
+      sections:[
+        { heading:null, items:[
+          {label:"Standard Raw Material / AI Recipe - activated", options:["Yes","No"]},
+          {label:"Dashboard", options:["Yes","No"]},
+          {label:"Upload Invoice", options:["Yes","No"], note:true},
+          {label:"Review Invoice", options:["Yes","No"]},
+          {label:"Tag Management", options:["Yes","No"]},
+          {label:"Push to Petpooja", options:["Yes","No"]},
+          {label:"Reports", options:["Yes","No"]},
+          {label:"Petty Cash Management", options:["Yes","No"]},
+          {label:"Purchase App", options:["Yes","No"]},
+          {label:"Banking & KYC", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    task: {
+      header:null,
+      sections:[
+        { heading:null, items:[
+          {label:"Task Assignment Process Understanding Taken", options:["Yes","No"]},
+          {label:"Sub Task / Group Task – Applicable or Not", options:["Yes","No","NA"]},
+          {label:"Project Management – Applicable or Not", options:["Yes","No","NA"]},
+          {label:"Forms – Applicable or Not", options:["Yes","No","NA"]},
+          {label:"Application Downloaded & Login URL Bookmarked", options:["Yes","No"]},
+          {label:"Department Created & User Assigned", options:["Yes","No"]},
+          {label:"Task Assignment and Browse Templates", options:["Yes","No"]},
+          {label:"Task Completion Process Explained", options:["Yes","No"]},
+          {label:"Reports", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    reservation: {
+      header:null,
+      sections:[
+        { heading:null, items:[
+          {label:"Employee Management", options:["Yes","No","NA"]},
+          {label:"Form & QR Creation", options:["Yes","No"]},
+          {label:"Reservation and Queue Management Feature", options:["Yes","No"]},
+          {label:"Inquiries", options:["Yes","No"]},
+          {label:"Order While In Queue", options:["Yes","No","NA"]},
+          {label:"Customer Profile", options:["Yes","No"]},
+          {label:"RSVP Feature Explained", options:["Yes","No"]},
+          {label:"Cover Charge & Transaction", options:["Yes","No","NA"]},
+          {label:"Live Table Flow", options:["Yes","No"]},
+          {label:"Calendar View", options:["Yes","No"]},
+          {label:"Feedback Flow", options:["Yes","No"]},
+          {label:"Reservations Management and Aggregator Integrations", options:["Yes","No"]},
+          {label:"Report", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    edc: {
+      header:null,
+      sections:[
+        { heading:"Mosambee EDC", items:[
+          {label:"Static IP Fix", options:["Yes","No"]},
+          {label:"Explain POS Billing & Order Landing Process (Dine In Order)", options:["Yes","No","NA"]},
+          {label:"MQTT Cover (Pick Up & Delivery Order)", options:["Yes","No","NA"]},
+          {label:"Add Money Feature Guided", options:["Yes","No","NA"]},
+          {label:"Finance Dashboard Training", options:["Yes","No","NA"]},
+          {label:"Payment Reconciliation", options:["Yes","No","NA"]}
+        ]},
+        { heading:"Petpooja Pay/EDC", items:[
+          {label:"Explain POS Billing Process", options:["Yes","No"]},
+          {label:"Demonstrate Payment Collection Process", options:["Yes","No"]},
+          {label:"Share Transaction Proof", options:["Yes","No"]},
+          {label:"Explain POS–EDC Device Connectivity & Static IP Fix", options:["Yes","No"]}
+        ]}
+      ]
+    },
+
+    wcd: {
+      header:null,
+      sections:[
+        { heading:null, items:[
+          {label:"Waiter Calling Devices (08) Installation (Setup type - Wi-Fi) & Training", options:["Yes","No"]}
+        ]}
+      ],
+      fixedNote:"Here I attached the screenshot of the working WCD\n\nNote: You have to charge all the devices for a full night with a dedicated charger only, and make sure every 4-5 days we charge the devices subsequently. If a device is fully discharged, the device lights will turn on only after half an hour of continuous charging."
+    }
+  };
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---- Render checklist UI for the chosen template ----
+  function renderChecklist(key){
+    const container = document.getElementById('checklistFields');
+    const t = templates[key];
+    if(!t){ container.innerHTML = ''; return; }
+    let html = '';
+    t.sections.forEach((sec, sIdx) => {
+      if(sec.heading) html += `<div class="cl-heading">${escapeHtml(sec.heading)}</div>`;
+      sec.items.forEach((item, iIdx) => {
+        const uid = `cl_${key}_${sIdx}_${iIdx}`;
+        const def = item.default || item.options[0];
+        html += `<div class="cl-item"><span class="cl-label">${escapeHtml(item.label)}</span><span class="cl-options">`;
+        item.options.forEach(opt => {
+          const checked = opt === def ? 'checked' : '';
+          html += `<label class="cl-opt"><input type="radio" name="${uid}" value="${escapeHtml(opt)}" ${checked}> ${escapeHtml(opt)}</label>`;
+        });
+        html += `</span>`;
+        if(item.note){
+          html += `<input type="text" class="cl-note" id="${uid}_note" placeholder="Count (optional)">`;
+        }
+        html += `</div>`;
+      });
+    });
+    if(t.fixedNote){
+      html += `<div class="cl-fixed-note">${escapeHtml(t.fixedNote)}</div>`;
+    }
+    container.innerHTML = html;
+    restoreChecklistSelections();
+  }
+
+  function restoreChecklistSelections(){
+    document.querySelectorAll('#checklistFields input[type="radio"]').forEach(r => {
+      const saved = localStorage.getItem(r.name);
+      if(saved !== null) r.checked = (r.value === saved);
+    });
+    document.querySelectorAll('#checklistFields input.cl-note').forEach(n => {
+      const saved = localStorage.getItem(n.id);
+      if(saved !== null) n.value = saved;
+    });
+  }
+
+  // ---- Build the checklist text block for the generated email ----
+  function getChecklistText(key){
+    const t = templates[key];
+    if(!t) return '';
+    let lines = [];
+    if(t.header) { lines.push(t.header); lines.push(''); }
+    t.sections.forEach((sec, sIdx) => {
+      if(sec.heading) lines.push(sec.heading);
+      sec.items.forEach((item, iIdx) => {
+        const uid = `cl_${key}_${sIdx}_${iIdx}`;
+        const checkedInput = document.querySelector(`input[name="${uid}"]:checked`);
+        const value = checkedInput ? checkedInput.value : (item.default || item.options[0]);
+        let line = `${item.label} : ${value}`;
+        if(item.note){
+          const noteEl = document.getElementById(`${uid}_note`);
+          if(noteEl && noteEl.value.trim()) line += ` (Count: ${noteEl.value.trim()})`;
+        }
+        lines.push(line);
+      });
+      lines.push('');
+    });
+    if(t.fixedNote){
+      lines.push(t.fixedNote);
+    }
+    // collapse trailing blank lines, keep single blank line between sections
+    return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
   // ---- Conditional field logic ----
   function refreshConditionals(){
     const trainingType = document.getElementById('trainingType').value;
@@ -476,19 +834,27 @@
   });
   document.getElementById('staffCheck').addEventListener('change', refreshConditionals);
 
+  document.getElementById('template').addEventListener('change', function(){
+    renderChecklist(this.value);
+    autoSave();
+  });
+
   // ---- Auto-save ----
   function autoSave() {
     document.querySelectorAll("input, select, textarea").forEach(el => {
       if (el.type === "checkbox") {
         localStorage.setItem(el.id || el.value, el.checked ? "1" : "0");
+      } else if (el.type === "radio") {
+        if (el.checked) localStorage.setItem(el.name, el.value);
       } else {
-        localStorage.setItem(el.id, el.value);
+        if (el.id) localStorage.setItem(el.id, el.value);
       }
     });
     localStorage.setItem("outputContent", document.getElementById("output").innerText);
   }
   function restoreData() {
     document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.closest('#checklistFields')) return; // handled after render
       if (el.type === "checkbox") {
         const key = el.id || el.value;
         const saved = localStorage.getItem(key);
@@ -504,6 +870,7 @@
       document.getElementById('date').value = new Date().toISOString().split('T')[0];
     }
     refreshConditionals();
+    renderChecklist(val('template'));
   }
   window.addEventListener("input", autoSave);
   window.addEventListener("change", autoSave);
@@ -625,171 +992,10 @@ Feedback link: https://forms.gle/XXHMVTV8xxZH3AXg6`;
     return out;
   }
 
-  const checklists = {
-    retail: `Basic Setup:
-Login Process : Yes / No
-Item Addition : Yes / No
-Inventory Preferences : Yes / No
-Sales Preferences : Yes / No
-POS Preferences : Yes / No
-GST and Tax Preferences : Yes / No
-
-POS & Hardware Setup:
-POS Installations and Counter Set-up : Yes / No
-Printers and Template Set-up : Yes / No
-Barcode Set-up and Printing Guide : Yes / No
-
-Operations & Transactions:
-Stock Management : Yes / No
-Purchase Bill and Purchase Training (Advance Plan) : Yes / No / NA
-Auto-sync and Retail Invoices on the Dashboard : Yes / No
-Dashboard Overview : Yes / No
-Invoice Creation and Preferences : Yes / No
-Process of Adding Receipts and Payments : Yes / No
-POS Overview and Understanding : Yes / No
-Step-by-step POS Usage Guide : Yes / No
-AI Garments Try on : Yes / No
-
-Reports & Monitoring:
-Reports and Dashboard : Yes / No`,
-
-    payroll: `Petpooja Payroll:
-
-Phase 1
-Owner Dashboard & Mobile App : Yes
-Biometric Device Intro & Setup : No
-Device Light Indication : No
-Wi-Fi Connectivity : No
-
-Phase 2
-Add Employee (Web & App) : Yes (Web)
-Biometric Registration : No
-Shift & Roster Management : Yes
-Week Off & Leave Setup : Yes
-User Management & Reports : Yes
-Payroll Module & Salary Slip : Yes
-Owner App Quick Actions : No
-
-Phase 3
-Employee App Training : No
-Language Setup : No
-Leave Apply & Regularisation : Yes
-Attendance & Salary Slip Check : Yes
-Re login after Device Change : Yes`,
-
-    pos: `POS Check List:
-POS Installation & Setup : Yes / No
-Printer Configuration & Cash Drawer : Yes / No
-Billing & Order Flow : Yes / No
-Operations : Yes / No
-Item Management (POS Menu) : Yes / No
-Inventory & Stock Management : Yes / No
-Reports : Yes / No
-Restaurant Configuration & Logs : Yes / No
-
-Dashboard Check List:
-Main Dashboard View : Yes / No
-Daily Operations : Yes / No
-Menu Management : Yes / No
-Reports : Yes / No
-CRM : Yes / No
-User Management : Yes / No
-Petpooja Agent AI : Yes / No
-Petpooja App & Quick Links Configurations : Yes / No`,
-
-    pospayroll: `Petpooja POSS :
-1) Billing & KOT management.
-2) Printer Setup.(Kitchen LAN printer)
-3) Reports.
-4) Menu management.
-5) Owner Dashboard.
-6) Captain app ordering.
-
-Petpooja Payroll:
-Phase 1
-Owner Dashboard & Mobile App : Yes
-Biometric Device Intro & Setup : No
-Device Light Indication : No
-Wi-Fi Connectivity : No
-
-Phase 2
-Add Employee (Web & App) : Yes (Web)
-Biometric Registration : No
-Shift & Roster Management : Yes
-Week Off & Leave Setup : Yes
-User Management & Reports : Yes
-Payroll Module & Salary Slip : Yes
-Owner App Quick Actions : No
-
-Phase 3
-Employee App Training : No
-Language Setup : No
-Leave Apply & Regularisation : Yes
-Attendance & Salary Slip Check : Yes
-Re login after Device Change : Yes`,
-
-    purchase: `Standard Raw Material / AI Recipe - activated: Yes/No
-Dashboard: Yes/No
-Upload Invoice: Yes/No (mention count)
-Review Invoice: Yes/No
-Tag Management: Yes/No
-Push to Petpooja: Yes/No
-Reports: Yes/No
-Petty Cash Management: Yes/No
-Purchase App: Yes/No
-Banking & KYC: Yes/No`,
-
-    task: `Task Assignment Process Understanding Taken : Yes / No
-Sub Task / Group Task – Applicable or Not : Yes / No / NA
-Project Management – Applicable or Not : Yes / No / NA
-Forms – Applicable or Not : Yes / No / NA
-Application Downloaded & Login URL Bookmarked : Yes / No
-Department Created & User Assigned : Yes / No
-Task Assignment and Browse Templates : Yes / No
-Task Completion Process Explained : Yes / No
-Reports : Yes / No`,
-
-    reservation: `Employee Management : Yes / No / NA
-Form & QR Creation : Yes / No
-Reservation and Queue Management Feature : Yes / No
-Inquiries : Yes / No
-Order While In Queue : Yes / No / NA
-Customer Profile : Yes / No
-RSVP Feature Explained : Yes / No
-Cover Charge & Transaction : Yes / No / NA
-Live Table Flow : Yes / No
-Calendar View : Yes / No
-Feedback Flow : Yes / No
-Reservations Management and Aggregator Integrations : Yes / No
-Report : Yes / No`,
-
-    edc: `Mosambee EDC
-
-Static IP Fix : Yes / No
-Explain POS Billing & Order Landing Process (Dine In Order) : Yes / No / NA
-MQTT Cover (Pick Up & Delivery Order) : Yes / No / NA
-Add Money Feature Guided : Yes / No / NA
-Finance Dashboard Training : Yes / No / NA
-Payment Reconciliation : Yes / No / NA
-
-Petpooja Pay/EDC
-
-Explain POS Billing Process : Yes / No
-Demonstrate Payment Collection Process : Yes / No
-Share Transaction Proof : Yes / No
-Explain POS–EDC Device Connectivity & Static IP Fix : Yes / No`,
-
-    wcd: `1) Waiter Calling Devices (08) Installation (Setup type - wifi) & Training
-
-Here I attached the screenshot of the working WCD
-
-Note: You have to charge all the devices for a full night with a dedicated charger only, and make sure every 4-5 days we charge the devices subsequently. If a device is fully discharged, the device lights will turn on only after half an hour of continuous charging.`
-  };
-
   function generateTemplate() {
     const template = val('template');
     const header = buildHeader();
-    const checklist = checklists[template] || '';
+    const checklist = getChecklistText(template);
     const footer = buildFooter();
 
     const content = header + checklist + '\n' + footer;
@@ -800,12 +1006,14 @@ Note: You have to charge all the devices for a full night with a dedicated charg
   function resetForm() {
     localStorage.clear();
     document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.closest('#checklistFields')) return;
       if (el.type === "checkbox") el.checked = false;
       else el.value = "";
     });
     document.getElementById("output").innerText = "";
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
     refreshConditionals();
+    renderChecklist(val('template'));
   }
 
   function copyOutput() {
