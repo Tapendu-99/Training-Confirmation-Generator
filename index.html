@@ -234,7 +234,7 @@
 
   .output-card{
     padding:22px 22px 26px;
-    position:sticky;
+    POSSition:sticky;
     top:20px;
     display:flex;
     flex-direction:column;
@@ -279,12 +279,12 @@
     margin-top:10px;
     display:none;
   }
-  .hidden-textarea{position:absolute;left:-9999px;}
+  .hidden-textarea{POSSition:absolute;left:-9999px;}
 
   @media (max-width: 980px){
     .container{grid-template-columns:1fr;}
     .grid2{grid-template-columns:1fr;}
-    .output-card{position:static;max-height:none;}
+    .output-card{POSSition:static;max-height:none;}
     input, select, textarea, button{font-size:16px;padding:12px;}
   }
 </style>
@@ -372,7 +372,7 @@
       <div class="field">
         <label for="product">Product</label>
         <select id="product">
-          <option value="POS">POS</option>
+          <option value="POSS">POSS</option>
           <option value="Payroll">Payroll</option>
           <option value="PP Invoice">PP Invoice</option>
           <option value="Purchase">Purchase</option>
@@ -380,17 +380,17 @@
           <option value="Task Management">Task Management</option>
           <option value="Reservation">Reservation</option>
           <option value="Mosambee EDC / Petpooja Pay">Mosambee EDC / Petpooja Pay</option>
-          <option value="Retail POS">Retail POS</option>
+          <option value="Retail POSS">Retail POSS</option>
           <option value="Other">Other</option>
         </select>
       </div>
       <div class="field">
         <label for="subProduct">Sub-product</label>
         <select id="subProduct">
-          <option value="POS Basic">POS Basic</option>
-          <option value="POS+Growth">POS+Growth</option>
-          <option value="POS+Scale">POS+Scale</option>
-          <option value="Local POS Basic">Local POS Basic</option>
+          <option value="POSS Basic">POSS Basic</option>
+          <option value="POSS+Growth">POSS+Growth</option>
+          <option value="POSS+Scale">POSS+Scale</option>
+          <option value="Local POSS Basic">Local POSS Basic</option>
           <option value="Petpooja Invoice Android (Basic)">Petpooja Invoice Android (Basic)</option>
           <option value="Petpooja Invoice Android (Advance)">Petpooja Invoice Android (Advance)</option>
           <option value="Petpooja Invoice Desktop (Basic)">Petpooja Invoice Desktop (Basic)</option>
@@ -490,14 +490,14 @@
         <label for="template">Select Template</label>
         <select id="template">
           <option value="payroll">Payroll Template</option>
-          <option value="pos">POS Template</option>
-          <option value="pospayroll">POS with Payroll Template</option>
+          <option value="POSS">POSS Template</option>
+          <option value="POSSpayroll">POSS with Payroll Template</option>
           <option value="purchase">Petpooja Purchase Template</option>
           <option value="wcd">WCD Template</option>
           <option value="task">Task Template</option>
           <option value="reservation">Reservation Template</option>
           <option value="edc">Mosambee EDC & Petpooja Pay/EDC Template</option>
-          <option value="retail">Retail POS Template</option>
+          <option value="retail">Retail POSS Template</option>
         </select>
       </div>
     </div>
@@ -547,11 +547,11 @@
           {label:"Item Addition", options:["Yes","No"]},
           {label:"Inventory Preferences", options:["Yes","No"]},
           {label:"Sales Preferences", options:["Yes","No"]},
-          {label:"POS Preferences", options:["Yes","No"]},
+          {label:"POSS Preferences", options:["Yes","No"]},
           {label:"GST and Tax Preferences", options:["Yes","No"]}
         ]},
-        { heading:"POS & Hardware Setup:", items:[
-          {label:"POS Installations and Counter Set-up", options:["Yes","No"]},
+        { heading:"POSS & Hardware Setup:", items:[
+          {label:"POSS Installations and Counter Set-up", options:["Yes","No"]},
           {label:"Printers and Template Set-up", options:["Yes","No"]},
           {label:"Barcode Set-up and Printing Guide", options:["Yes","No"]}
         ]},
@@ -562,8 +562,8 @@
           {label:"Dashboard Overview", options:["Yes","No"]},
           {label:"Invoice Creation and Preferences", options:["Yes","No"]},
           {label:"Process of Adding Receipts and Payments", options:["Yes","No"]},
-          {label:"POS Overview and Understanding", options:["Yes","No"]},
-          {label:"Step-by-step POS Usage Guide", options:["Yes","No"]},
+          {label:"POSS Overview and Understanding", options:["Yes","No"]},
+          {label:"Step-by-step POSS Usage Guide", options:["Yes","No"]},
           {label:"AI Garments Try on", options:["Yes","No"]}
         ]},
         { heading:"Reports & Monitoring:", items:[
@@ -600,15 +600,15 @@
       ]
     },
 
-    pos: {
+    POSS: {
       header:null,
       sections:[
-        { heading:"POS Check List:", items:[
-          {label:"POS Installation & Setup", options:["Yes","No"]},
+        { heading:"POSS Check List:", items:[
+          {label:"POSS Installation & Setup", options:["Yes","No"]},
           {label:"Printer Configuration & Cash Drawer", options:["Yes","No"]},
           {label:"Billing & Order Flow", options:["Yes","No"]},
           {label:"Operations", options:["Yes","No"]},
-          {label:"Item Management (POS Menu)", options:["Yes","No"]},
+          {label:"Item Management (POSS Menu)", options:["Yes","No"]},
           {label:"Inventory & Stock Management", options:["Yes","No"]},
           {label:"Reports", options:["Yes","No"]},
           {label:"Restaurant Configuration & Logs", options:["Yes","No"]}
@@ -626,10 +626,10 @@
       ]
     },
 
-    pospayroll: {
+    POSSpayroll: {
       header:null,
       sections:[
-        { heading:"Petpooja POSS:", items:[
+        { heading:"Petpooja POSSS:", items:[
           {label:"Billing & KOT management", options:["Yes","No"]},
           {label:"Printer Setup (Kitchen LAN printer)", options:["Yes","No"]},
           {label:"Reports", options:["Yes","No"]},
@@ -724,17 +724,17 @@
       sections:[
         { heading:"Mosambee EDC", items:[
           {label:"Static IP Fix", options:["Yes","No"]},
-          {label:"Explain POS Billing & Order Landing Process (Dine In Order)", options:["Yes","No","NA"]},
+          {label:"Explain POSS Billing & Order Landing Process (Dine In Order)", options:["Yes","No","NA"]},
           {label:"MQTT Cover (Pick Up & Delivery Order)", options:["Yes","No","NA"]},
           {label:"Add Money Feature Guided", options:["Yes","No","NA"]},
           {label:"Finance Dashboard Training", options:["Yes","No","NA"]},
           {label:"Payment Reconciliation", options:["Yes","No","NA"]}
         ]},
         { heading:"Petpooja Pay/EDC", items:[
-          {label:"Explain POS Billing Process", options:["Yes","No"]},
+          {label:"Explain POSS Billing Process", options:["Yes","No"]},
           {label:"Demonstrate Payment Collection Process", options:["Yes","No"]},
           {label:"Share Transaction Proof", options:["Yes","No"]},
-          {label:"Explain POS–EDC Device Connectivity & Static IP Fix", options:["Yes","No"]}
+          {label:"Explain POSS–EDC Device Connectivity & Static IP Fix", options:["Yes","No"]}
         ]}
       ]
     },
